@@ -34,5 +34,10 @@
   ],
   "dependencies": {
     "react": "^18.2.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/semanticist21/pxtorem"
+  },
+  "license": "MIT"
 }
