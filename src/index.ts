@@ -1,8 +1,9 @@
-let rootPx = getComputedStyle
-  ? Number(
-      getComputedStyle(document.documentElement).fontSize.replace("px", "")
-    )
-  : 16;
+let rootPx =
+  typeof getComputedStyle !== "undefined"
+    ? Number(
+        getComputedStyle(document.documentElement).fontSize.replace("px", "")
+      )
+    : 16;
 
 // event handler
 // update rootPx when visibility change
@@ -10,11 +11,9 @@ let rootPx = getComputedStyle
 const handleWindowVisibilityChange = () => {
   if (!document || document.hidden || !getComputedStyle) return;
 
-  if (getComputedStyle) {
-    rootPx = Number(
-      getComputedStyle(document.documentElement).fontSize.replace("px", "")
-    );
-  }
+  rootPx = Number(
+    getComputedStyle(document.documentElement).fontSize.replace("px", "")
+  );
 };
 
 if (typeof window !== "undefined") {
