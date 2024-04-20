@@ -34,8 +34,9 @@ function Example() {
   console.log(pxValueString); // '16px'
 
   // update base px
-  // please invoke this function when your app is using SSR in somewhere useEffect.
-  // it is to support font size change by visibility(as the user leaves its current tab).
+  // please invoke this function when your app is using SSR in somewhere like useEffect.
+  // it is to support font size change by visibility,
+  // as the user leaves its current tab when change font size.
   useEffect(() => {
     updateBasePx();
   }, []);
