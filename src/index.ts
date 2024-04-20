@@ -1,11 +1,19 @@
-let rootPx = getComputedStyle(document.documentElement).fontSize || "16px";
+let rootPx = getComputedStyle
+  ? Number(
+      getComputedStyle(document.documentElement).fontSize.replace("px", "")
+    )
+  : 16;
 
 // event handler
+// update rootPx when visibility change
+// only in csr.
 const handleWindowVisibilityChange = () => {
   if (!document || document.hidden || !getComputedStyle) return;
 
   if (getComputedStyle) {
-    rootPx = getComputedStyle(document.documentElement).fontSize || "16px";
+    rootPx = Number(
+      getComputedStyle(document.documentElement).fontSize.replace("px", "")
+    );
   }
 };
 
@@ -13,14 +21,45 @@ if (typeof window !== "undefined") {
   window.addEventListener("visibilitychange", handleWindowVisibilityChange);
 }
 
+/**
+ *
+ * @param px [number] - pixel value
+ * @returns [number] - rem value
+ */
 export const pxToRem = (px: number): number => {
-  return px / parseFloat(rootPx.replace("px", ""));
+  return px / rootPx;
 };
 
+/**
+ *
+ * @param px [number] - pixel value
+ * @returns [string] - rem value with 'rem' unit
+ */
+export const pxToRemString = (px: number): string => {
+  return `${pxToRem(px)}rem`;
+};
+
+/**
+ *
+ * @param rem [number] - rem value
+ * @returns [number] - pixel value
+ */
 export const remToPx = (rem: number): number => {
-  return parseFloat(rootPx) * rem;
+  return rootPx * rem;
 };
 
+/**
+ *
+ * @param rem [number] - rem value
+ * @returns [string] - rem value with 'rem' unit
+ */
+export const remToPxString = (rem: number): string => {
+  return `${remToPx(rem)}px`;
+};
+
+/**
+ * update base px by yourself if your app is using SSR.
+ */
 export const updateBasePx = () => {
   if (!getComputedStyle) {
     console.error(
@@ -28,5 +67,7 @@ export const updateBasePx = () => {
     );
   }
 
-  rootPx = getComputedStyle(document.documentElement).fontSize || "16px";
+  rootPx = Number(
+    getComputedStyle(document.documentElement).fontSize.replace("px", "")
+  );
 };
