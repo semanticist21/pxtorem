@@ -20,6 +20,15 @@ if (typeof window !== "undefined") {
   window.addEventListener("visibilitychange", handleWindowVisibilityChange);
 }
 
+export const removeHandleWindowVisibilityChange = () => {
+  if (typeof window !== "undefined") {
+    window.removeEventListener(
+      "visibilitychange",
+      handleWindowVisibilityChange
+    );
+  }
+};
+
 /**
  *
  * @param px [number] - pixel value
@@ -70,3 +79,4 @@ export const updateBasePx = () => {
     getComputedStyle(document.documentElement).fontSize.replace("px", "")
   );
 };
+
