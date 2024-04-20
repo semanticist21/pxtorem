@@ -1,4 +1,4 @@
-import { pxToRem } from ".";
+import { pxToRem, remToPx } from ".";
 import { test, expect } from "@jest/globals";
 
 test("pxToRem", () => {
@@ -12,3 +12,23 @@ test("pxToRem", () => {
   // Assert
   expect(result).toBe(expected);
 });
+
+test("remToPx", () => {
+  // Arrange
+  const rem = 0.5;
+  const expected = 8;
+
+  // Act
+  const result = remToPx(rem);
+
+  // Assert
+  expect(result).toBe(expected);
+});
+
+test("check document", () => {
+  expect(document).toBeDefined();
+})
+
+test("check window", () => {
+  expect(window).toBeDefined();
+})
