@@ -2,7 +2,7 @@
 
 `@kkoms/pxtorem` is a typescript library for calculating px value to rem.
 rootPx is calculated based on `getComputedStyle(document.documentElement).fontsize`.
-Update its value when visibility changes(only in csr).
+Update its value when visibility changes.
 
 ## Installation
 
