@@ -20,6 +20,9 @@ if (typeof window !== "undefined") {
   window.addEventListener("visibilitychange", handleWindowVisibilityChange);
 }
 
+/**
+ * remove existing event listener
+ */
 export const removeHandleWindowVisibilityChange = () => {
   if (typeof window !== "undefined") {
     window.removeEventListener(
