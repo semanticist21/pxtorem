@@ -27,8 +27,8 @@ test("remToPx", () => {
 
 test("check document", () => {
   expect(document).toBeDefined();
-})
+});
 
 test("check window", () => {
   expect(window).toBeDefined();
-})
+});

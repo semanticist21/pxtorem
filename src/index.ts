@@ -1,9 +1,15 @@
-let rootPx =
-  typeof getComputedStyle !== "undefined"
-    ? Number(
-        getComputedStyle(document.documentElement).fontSize.replace("px", "")
-      )
-    : 16;
+const hasDocument = typeof document !== "undefined";
+const hasGetComputedStyle = typeof getComputedStyle !== "undefined";
+const hasFontValue =
+  hasGetComputedStyle &&
+  hasDocument &&
+  !!getComputedStyle(document.documentElement).fontSize;
+
+let rootPx = hasFontValue
+  ? Number(
+      getComputedStyle(document.documentElement).fontSize.replace("px", "")
+    )
+  : 16;
 
 // event handler
 // update rootPx when visibility change
@@ -82,4 +88,3 @@ export const updateBasePx = () => {
     getComputedStyle(document.documentElement).fontSize.replace("px", "")
   );
 };
-
