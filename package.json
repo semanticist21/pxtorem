@@ -1,14 +1,14 @@
 {
   "name": "@kkoms/pxtorem",
   "private": false,
-  "version": "0.1.13",
+  "version": "0.1.14",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "jest",
-    "publish-prod": "pnpm run build && pnpm run test && npm publish"
+    "publish-prod": "pnpm run build && pnpm run test && npm publish --access=public"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
