@@ -1,34 +1,115 @@
-import { pxToRem, remToPx } from ".";
-import { test, expect } from "@jest/globals";
+import { afterEach, describe, expect, test } from "bun:test";
+import { Window } from "happy-dom";
 
-test("pxToRem", () => {
-  // Arrange
-  const px = 8;
-  const expected = 0.5;
+const originalDocument = globalThis.document;
+const originalGetComputedStyle = globalThis.getComputedStyle;
+const originalWindow = globalThis.window;
 
-  // Act
-  const result = pxToRem(px);
+const installDom = (rootFontSize: string) => {
+  const window = new Window();
+  Object.defineProperty(window, "SyntaxError", {
+    configurable: true,
+    value: SyntaxError,
+  });
+  window.document.documentElement.style.fontSize = rootFontSize;
 
-  // Assert
-  expect(result).toBe(expected);
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: window,
+  });
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: window.document,
+  });
+  Object.defineProperty(globalThis, "getComputedStyle", {
+    configurable: true,
+    value: window.getComputedStyle.bind(window),
+  });
+};
+
+const restoreGlobal = <T>(key: keyof typeof globalThis, value: T) => {
+  if (value === undefined) {
+    Reflect.deleteProperty(globalThis, key);
+    return;
+  }
+
+  Object.defineProperty(globalThis, key, {
+    configurable: true,
+    value,
+  });
+};
+
+afterEach(() => {
+  restoreGlobal("window", originalWindow);
+  restoreGlobal("document", originalDocument);
+  restoreGlobal("getComputedStyle", originalGetComputedStyle);
 });
 
-test("remToPx", () => {
-  // Arrange
-  const rem = 0.5;
-  const expected = 8;
+const importFresh = (name: string) => import(`./index.ts?${name}`);
 
-  // Act
-  const result = remToPx(rem);
+describe("px/rem conversion", () => {
+  test("uses the document root font size when updating the base px", async () => {
+    installDom("20px");
 
-  // Assert
-  expect(result).toBe(expected);
-});
+    const { pxToRem, pxToRemString, remToPx, remToPxString, updateBasePx } =
+      await importFresh("root-font-size");
 
-test("check document", () => {
-  expect(document).toBeDefined();
-});
+    updateBasePx();
 
-test("check window", () => {
-  expect(window).toBeDefined();
+    expect(pxToRem(10)).toBe(0.5);
+    expect(pxToRemString(10)).toBe("0.5rem");
+    expect(remToPx(0.5)).toBe(10);
+    expect(remToPxString(0.5)).toBe("10px");
+  });
+
+  test("refreshes the base px when the document becomes visible", async () => {
+    installDom("16px");
+
+    const { pxToRem, updateBasePx } = await importFresh("visibility-change");
+    updateBasePx();
+    expect(pxToRem(16)).toBe(1);
+
+    document.documentElement.style.fontSize = "32px";
+    document.dispatchEvent(new window.Event("visibilitychange"));
+
+    expect(pxToRem(16)).toBe(0.5);
+  });
+
+  test("can remove the visibility change listener", async () => {
+    installDom("16px");
+
+    const { pxToRem, removeHandleWindowVisibilityChange, updateBasePx } =
+      await importFresh("remove-listener");
+
+    updateBasePx();
+    removeHandleWindowVisibilityChange();
+
+    document.documentElement.style.fontSize = "32px";
+    document.dispatchEvent(new window.Event("visibilitychange"));
+
+    expect(pxToRem(16)).toBe(1);
+  });
+
+  test("falls back to 16px when imported without browser globals", async () => {
+    const proc = Bun.spawn({
+      cmd: [
+        process.execPath,
+        "-e",
+        "const mod = await import('./src/index.ts'); console.log(`${mod.pxToRem(16)} ${mod.remToPx(1)}`);",
+      ],
+      cwd: process.cwd(),
+      stderr: "pipe",
+      stdout: "pipe",
+    });
+
+    const [stdout, stderr, exitCode] = await Promise.all([
+      new Response(proc.stdout).text(),
+      new Response(proc.stderr).text(),
+      proc.exited,
+    ]);
+
+    expect(stderr).toBe("");
+    expect(exitCode).toBe(0);
+    expect(stdout.trim()).toBe("1 16");
+  });
 });

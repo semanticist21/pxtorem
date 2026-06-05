@@ -1,12 +1,14 @@
 # @kkoms/pxtorem
 
 `@kkoms/pxtorem` is a typescript library for calculating px value to rem.
-rootPx is calculated based on `getComputedStyle(document.documentElement).fontsize`.
+rootPx is calculated based on `getComputedStyle(document.documentElement).fontSize`.
 Update its value when visibility changes.
 
 ## Installation
 
 ```shell
+bun add @kkoms/pxtorem
+# or
 yarn add @kkoms/pxtorem
 # or
 npm install @kkoms/pxtorem --save
@@ -43,4 +45,19 @@ function Example() {
   // if you want to remove it, you can use removeHandleWindowVisibilityChange.
   removeHandleWindowVisibilityChange();
 }
+```
+
+## SSR
+
+When browser globals are unavailable, the library falls back to a 16px root size. In
+client code, call `updateBasePx()` after mount if your app changes the root font size
+during hydration.
+
+## Development
+
+```shell
+bun install
+bun run test
+bun run typecheck
+bun run build
 ```

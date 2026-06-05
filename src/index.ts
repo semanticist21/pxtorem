@@ -1,37 +1,46 @@
-const hasDocument = typeof document !== "undefined";
-const hasGetComputedStyle = typeof getComputedStyle !== "undefined";
-const hasFontValue =
-  hasGetComputedStyle &&
-  hasDocument &&
-  !!getComputedStyle(document.documentElement).fontSize;
+const DEFAULT_ROOT_PX = 16;
 
-let rootPx = hasFontValue
-  ? Number(
-      getComputedStyle(document.documentElement).fontSize.replace("px", "")
-    )
-  : 16;
+const getRootPx = (): number => {
+  if (
+    typeof document === "undefined" ||
+    typeof getComputedStyle === "undefined"
+  ) {
+    return DEFAULT_ROOT_PX;
+  }
+
+  const fontSize = getComputedStyle(document.documentElement).fontSize;
+  const rootPx = Number.parseFloat(fontSize);
+
+  return Number.isFinite(rootPx) && rootPx > 0 ? rootPx : DEFAULT_ROOT_PX;
+};
+
+let rootPx = getRootPx();
 
 // event handler
 // update rootPx when visibility change
 // only in csr.
 const handleWindowVisibilityChange = () => {
-  if (!document || document.hidden || !getComputedStyle) return;
+  if (
+    typeof document === "undefined" ||
+    typeof getComputedStyle === "undefined" ||
+    document.hidden
+  ) {
+    return;
+  }
 
-  rootPx = Number(
-    getComputedStyle(document.documentElement).fontSize.replace("px", "")
-  );
+  rootPx = getRootPx();
 };
 
-if (typeof window !== "undefined") {
-  window.addEventListener("visibilitychange", handleWindowVisibilityChange);
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", handleWindowVisibilityChange);
 }
 
 /**
  * remove existing event listener
  */
 export const removeHandleWindowVisibilityChange = () => {
-  if (typeof window !== "undefined") {
-    window.removeEventListener(
+  if (typeof document !== "undefined") {
+    document.removeEventListener(
       "visibilitychange",
       handleWindowVisibilityChange
     );
@@ -78,13 +87,5 @@ export const remToPxString = (rem: number): string => {
  * update base px by yourself if your app is using SSR.
  */
 export const updateBasePx = () => {
-  if (!getComputedStyle) {
-    console.error(
-      "getComputedStyle is undefined. Make sure you are running in a browser environment."
-    );
-  }
-
-  rootPx = Number(
-    getComputedStyle(document.documentElement).fontSize.replace("px", "")
-  );
+  rootPx = getRootPx();
 };
